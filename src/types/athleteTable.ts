@@ -1,0 +1,20 @@
+export type AthleteTableTypes = {
+    adaptive: boolean,
+    age: string,
+    body_weight: number,
+    cj1: number,
+    cj2: number,
+    cj3: number,
+    snatch1: number,
+    snatch2: number,
+    snatch3: number,
+    total: number,
+    snatch_best: number,
+    cj_best: number,
+    created_at: string,
+    date: string,
+    event_id: string,
+    id: number,
+    meet: string,
+    name: string
+}
