@@ -2,9 +2,9 @@
 
 import { createClient } from '@/utils/supabase/client';
 import type { AthleteTableTypes } from '@/types/athleteTable';
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type JSX } from 'react'
 
-export default function AthleteTable() {
+export default function AthleteTable(): JSX.Element {
     const [itemsPerPage, setItemsPerPage] = useState<number>(100)
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -21,13 +21,14 @@ export default function AthleteTable() {
         setAthleteSearch(event.target.value)
     }
 
-    async function fetchData() {
+    async function fetchData(): Promise<JSX.Element | undefined> {
         setLoading(true)
         try {
             const supabase = createClient();
             let query = supabase
                 .from("lifting_results")
-                .select();
+                .select()
+                .order('date', {ascending: false})
             if (athleteSearch) {
                 query = query.eq("name", athleteSearch);
             }
@@ -51,31 +52,30 @@ export default function AthleteTable() {
     }
     
     if (loading) {
-        return <div>Loading...</div>;
+        return <div className='flex flexbox mx-auto justify-center text-center'>Loading...</div>;
     }
     
-    function makeRate(column: keyof AthleteTableTypes) {
-        const successfulLifts = liftingResults.filter((result: AthleteTableTypes) => {
+    function makeRate(column: keyof AthleteTableTypes): number {
+        const successfulLifts: number = liftingResults.filter((result: AthleteTableTypes) => {
             const value = result[column];
             return typeof value === 'number' && value > 0;
         }).length;
         
-        const totalLifts = liftingResults.length;
-        const percentage = totalLifts > 0 ? (successfulLifts / totalLifts) * 100 : 0;
+        const totalLifts: number = liftingResults.length;
+        const percentage: number = totalLifts > 0 ? (successfulLifts / totalLifts) * 100 : 0;
         
         return percentage;
     }
 
     return (
         <main className="flex flex-col mx-auto items-center mb-10">
-            <div className='flex items-center justify-center gap-8'>
+            <div className='flex items-center justify-center gap-4'>
                 <input 
                     type='search' 
                     placeholder="Athlete Name" 
                     className="border p-1" 
-                    onSubmit={searchAthlete}
                 />
-                <button >Search Athlete</button>
+                <button className='p-1 border bg-blue-300 hover:bg-blue-400'>Search Athlete</button>
                 <form>
                     <label>Rows Per Page: </label>
                     <select 
@@ -96,7 +96,7 @@ export default function AthleteTable() {
                     <tr>
                         <th className="w-50 border border-gray-400 p-2 text-left">Name</th>
                         <th className="w-40 border border-gray-400 p-2 text-left">Date</th>
-                        <th className="w-70 border border-gray-400 p-2 text-left">Meet</th>
+                        <th className="w-90 border border-gray-400 p-2 text-left">Meet</th>
                         <th className="w-40 border border-gray-400 p-2 text-left">Bodyweight</th>
                         <th className="w-40 border border-gray-400 p-2 text-left">Snatch 1</th>
                         <th className="w-40 border border-gray-400 p-2 text-left">Snatch 2</th>
@@ -116,8 +116,8 @@ export default function AthleteTable() {
                         <tr key={results.id}>
                             <td className="w-50 border border-gray-400 p-2 text-left">{results.name}</td>
                             <td className="w-40 border border-gray-400 p-2 text-left">{results.date}</td>
-                            <td className="w-70 border border-gray-400 p-2 text-left">{results.meet}</td>
-                            <td className="w-40 border border-gray-400 p-2 text-left">{results.body_weight}</td>
+                            <td className="w-90 border border-gray-400 p-2 text-left">{results.meet}</td>
+                            <td className="w-40 border border-gray-400 p-2 text-left">{results.body_weight}kg</td>
                             <td className="w-40 border border-gray-400 p-2 text-left">{results.snatch1}</td>
                             <td className="w-40 border border-gray-400 p-2 text-left">{results.snatch2}</td>
                             <td className="w-40 border border-gray-400 p-2 text-left">{results.snatch3}</td>
@@ -132,7 +132,7 @@ export default function AthleteTable() {
                         <th className="w-50 border-l border-b border-l-gray-400 border-b-gray-400 p-2 "></th>
                         <th className="w-40 border-b border-b-gray-400 p-2"></th>
                         <th className="w-40 border-b border-b-gray-400 p-2"></th>
-                        <th className="w-70 border-b border-b-gray-400 p-2 text-left">Successful Lift %</th>
+                        <th className="w-90 border-b border-b-gray-400 p-2 text-left">Successful Lift %</th>
                         <th className="w-40 border border-gray-400 p-2 text-left">{makeRate('snatch1')}%</th>
                         <th className="w-40 border border-gray-400 p-2 text-left">{makeRate('snatch2')}%</th>
                         <th className="w-40 border border-gray-400 p-2 text-left">{makeRate('snatch3')}%</th>
